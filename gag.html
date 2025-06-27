@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌿 My Garden Game</title>
+  <style>
+    body {
+      background: #f0fff0;
+      text-align: center;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .plant {
+      font-size: 36px;
+      line-height: 100px;
+      margin: 10px auto;
+      height: 100px;
+      width: 100px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #garden {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    #seedMenu {
+      display: none;
+      margin: 10px auto;
+    }
+
+    #seedMenu button {
+      margin: 4px;
+      min-width: 160px;
+    }
+
+    #coinDisplay {
+      position: fixed;
+      bottom: 10px;
+      left: 15px;
+      font-weight: bold;
+      font-size: 16px;
+      background: #e0ffe0;
+      padding: 6px 12px;
+      border-radius: 5px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    #pauseModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #pauseModal > div {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px #0005;
+      text-align: center;
+      min-width: 250px;
+    }
+
+    #pauseBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 28px;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    #pauseBtn:hover {
+      background: #e0ffe0;
+    }
+
+    #toggleInventoryBtn {
+      position: fixed;
+      top: 15px;
+      left: 75px;
+      z-index: 1100;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 28px;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s;
+    }
+    #toggleInventoryBtn:hover {
+      background: #e0ffe0;
+    }
+
+    #loadGameModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #loadGameModal > div {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px #0005;
+      text-align: center;
+      min-width: 250px;
+      max-height: 80vh;
+      overflow: auto;
+    }
+
+    #sidePlantBtn {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      z-index: 1200;
+      background: #fff;
+      border: none;
+      border-radius: 24px 0 0 24px;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s;
+    }
+    #sidePlantBtn:hover {
+      background: #e0ffe0;
+    }
+    #sideHarvestBtn {
+      position: fixed;
+      top: calc(50% + 70px);
+      left: 0;
+      z-index: 1200;
+      background: #fff;
+      border: none;
+      border-radius: 24px 0 0 24px;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s;
+    }
+    #sideHarvestBtn:hover {
+      background: #e0ffe0;
+    }
+    #sideSellBtn {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      z-index: 1200;
+      background: #fff;
+      border: none;
+      border-radius: 0 24px 24px 0;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s;
+    }
+    #sideSellBtn:hover {
+      background: #e0ffe0;
+    }
+
+    #startupLoadModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.85);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #startupLoadModal > div {
+      background: #fff;
+      padding: 30px 40px 40px 40px;
+      border-radius: 18px;
+      box-shadow: 0 2px 20px #0008;
+      text-align: center;
+      min-width: 320px;
+      max-width: 96vw;
+      max-height: 90vh;
+      overflow: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 80vh;
+    }
+
+    #joinWorldBtn {
+      position: fixed;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      min-width: 80px;
+      width: 90px;
+      font-size: 0.9em;
+      padding: 6px 0;
+      border-radius: 8px;
+      border: none;
+      transition: background 0.2s;
+      color: #fff;
+      background: #aaa;
+      cursor: not-allowed;
+      box-shadow: 0 2px 8px #0002;
+      z-index: 3100;
+    }
+
+    #startupLoadModal h2 {
+      font-size: 2.2em;
+      margin-bottom: 24px;
+    }
+
+    #startupSaveList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 24px;
+      justify-content: center;
+    }
+
+    #startupLoadModal button {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 1.5em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #888;
+    }
+
+    #startupLoadModal button:hover {
+      color: #333;
+    }
+
+    /* Inventory display styles */
+    #inventoryDisplay {
+      margin: 24px auto 0 auto;
+      max-width: 600px;
+      background: #fffbe7;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+      padding: 16px 20px;
+      text-align: left;
+    }
+    #inventoryDisplay h3 {
+      margin-top: 0;
+    }
+    #inventoryList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    #inventoryList div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8f8f8;
+      border-radius: 8px;
+      padding: 6px 12px;
+      box-shadow: 0 1px 3px #0001;
+    }
+
+    #notEnoughMoneyMsg {
+      display: none;
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffdddd;
+      color: #b71c1c;
+      font-weight: bold;
+      padding: 12px 32px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #0002;
+      z-index: 3000;
+      font-size: 20px;
+    }
+    #noFruitsMsg {
+      display: none;
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff3cd;
+      color: #b26a00;
+      font-weight: bold;
+      padding: 12px 32px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #0002;
+      z-index: 3000;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌿 Grow, Harvest & Sell 🌻</h1>
+
+  <button onclick="toggleSeedMenu()">🌱 Buy Seed</button>
+  <div id="seedMenu"></div>
+
+  <button id="pauseBtn" onclick="pauseGame()" title="Pause Game">⏸️</button>
+  <button id="toggleInventoryBtn" onclick="toggleInventory()" title="Inventory" style="position:fixed;top:15px;left:75px;z-index:1100;background:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:28px;box-shadow:1px 1px 6px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.2s;">
+    🎒
+  </button>
+  <button id="sidePlantBtn" onclick="plantFromInventory()" style="position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:1200;background:#fff;border:none;border-radius:24px 0 0 24px;width:60px;height:60px;font-size:28px;box-shadow:1px 1px 6px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.2s;">🌱</button>
+  <span id="plantInfoDisplay" style="position:fixed;top:50%;left:70px;transform:translateY(-50%);z-index:1201;font-size:18px;background:#fffbe7;padding:8px 16px;border-radius:8px;box-shadow:0 1px 4px #0001;min-width:120px;text-align:left;"></span>
+  <button id="sideHarvestBtn" onclick="harvest()" style="position:fixed;top:calc(50% + 70px);left:0;z-index:1200;background:#fff;border:none;border-radius:24px 0 0 24px;width:60px;height:60px;font-size:28px;box-shadow:1px 1px 6px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.2s;">🍂</button>
+  <button id="sideSellBtn" onclick="sell()" style="position:fixed;top:50%;right:0;transform:translateY(-50%);z-index:1200;background:#fff;border:none;border-radius:0 24px 24px 0;width:60px;height:60px;font-size:28px;box-shadow:1px 1px 6px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.2s;">💰</button>
+
+  <div id="garden"></div>
+
+  <p id="coinDisplay">Shekels: <span id="coins">20</span></p>
+
+  <div id="pauseModal">
+    <div>
+      <h2>Game Paused</h2>
+      <button onclick="saveGame()">💾 Save Game</button>
+      <button onclick="showLoadGameModal()">📂 Load Game</button>
+      <button onclick="newGame()">🆕 New Game</button>
+      <button onclick="goToMenu()">🏠 Menu</button>
+      <br><br>
+      <button onclick="resumeGame()">▶️ Resume</button>
+    </div>
+  </div>
+  <div id="loadGameModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:#fff;padding:30px 40px;border-radius:12px;box-shadow:0 2px 10px #0005;text-align:center;min-width:250px;max-height:80vh;overflow:auto;">
+      <h2>Load Game</h2>
+      <div id="saveList"></div>
+      <br>
+      <button onclick="closeLoadGameModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Inventory display, hidden by default -->
+  <div id="inventoryDisplay" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); max-width:600px; background:#fffbe7; border-radius:12px; box-shadow:0 2px 8px #0001; padding:16px 20px; text-align:left; z-index:2001;">
+    <h3 style="margin-top:0;">Inventory</h3>
+    <div id="inventoryList" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
+  </div>
+
+  <div id="notEnoughMoneyMsg" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#ffdddd;color:#b71c1c;font-weight:bold;padding:12px 32px;border-radius:10px;box-shadow:0 2px 8px #0002;z-index:3000;font-size:20px;">Not enough shekels!</div>
+  <div id="noFruitsMsg" style="display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#fff3cd;color:#b26a00;font-weight:bold;padding:12px 32px;border-radius:10px;box-shadow:0 2px 8px #0002;z-index:3000;font-size:20px;">No fully grown plants to harvest!</div>
+
+  <script>
+    let coins = 20;
+    let selectedSeed = "carrot";
+    let plants = [], harvested = [], plantIntervals = [];
+
+    const inventory = {
+      // Common
+      carrot: 0, strawberry: 0, blueberry: 0,
+      "Orange Tulip": 0, Tomato: 0, corn: 0,
+      Daffodil: 0, Cauliflower: 0, Watermelon: 0,
+      Pumpkin: 0, apple: 0, bamboo: 0,
+      // Uncommon
+      "Green Apple": 0, Avocado: 0, Banana: 0,
+      Coconut: 0, Cactus: 0, "Dragon Fruit": 0, Mango: 0, Pineapple: 0, Kiwi: 0, "Bell Pepper": 0, "Prickly Pear": 0,
+      // Rare
+      Grape: 0, Mushroom: 0, Pepper: 0, Cacao: 0, Loquat: 0, Feijoa: 0,
+      // Legendary
+      Beanstalk: 0, "Ember Lily": 0, "Sugar Apple": 0
+    };
+
+    const prices = {
+      carrot: 10, strawberry: 50, blueberry: 400,
+      "Orange Tulip": 600, Tomato: 800, corn: 1300,
+      Daffodil: 1000, Cauliflower: 1300, Watermelon: 2500,
+      Pumpkin: 3000, apple: 3250, bamboo: 4000,
+      "Green Apple": 3500, Avocado: 5000, Banana: 7000,
+      Coconut: 6000, Cactus: 15000, "Dragon Fruit": 50000, Mango: 100000, Pineapple: 7500, Kiwi: 10000, "Bell Pepper": 55000, "Prickly Pear": 555000,
+      Grape: 850000, Mushroom: 150000, Pepper: 1000000, Cacao: 2500000, Loquat: 900000, Feijoa: 5000000,
+      Beanstalk: 10000000, "Ember Lily": 15000000, "Sugar Apple": 20000000
+    };
+
+    const sellValues = {
+      carrot: 22, strawberry: 304, blueberry: 404,
+      "Orange Tulip": 792, Tomato: 1680, corn: 2120,
+      Daffodil: 1590, Cauliflower: 2610, Watermelon: 5000,
+      Pumpkin: 5980, apple: 4870, bamboo: 10390,
+      "Green Apple": 6000, Avocado: 9000, Banana: 12000,
+      Coconut: 11000, Cactus: 25000, "Dragon Fruit": 90000, Mango: 180000, Pineapple: 14000, Kiwi: 18000, "Bell Pepper": 90000, "Prickly Pear": 1000000,
+      Grape: 1500000, Mushroom: 250000, Pepper: 1800000, Cacao: 4000000, Loquat: 1600000, Feijoa: 9000000,
+      Beanstalk: 18000000, "Ember Lily": 25000000, "Sugar Apple": 35000000
+    };
+
+    const emojiMap = {
+      carrot: "🥕", strawberry: "🍓", blueberry: "🫐",
+      "Orange Tulip": "🌷", Tomato: "🍅", corn: "🌽",
+      Daffodil: "🌼", Cauliflower: "🥦", Watermelon: "🍉",
+      Pumpkin: "🎃", apple: "🍎", bamboo: "🎋",
+      "Green Apple": "🍏", Avocado: "🥑", Banana: "🍌",
+      Coconut: "🥥", Cactus: "🌵", "Dragon Fruit": "🐉", Mango: "🥭", Pineapple: "🍍", Kiwi: "🥝", "Bell Pepper": "🫑", "Prickly Pear": "🌵",
+      Grape: "🍇", Mushroom: "🍄", Pepper: "🌶️", Cacao: "🍫", Loquat: "🍈", Feijoa: "🥥",
+      Beanstalk: "🌱", "Ember Lily": "🔥", "Sugar Apple": "🍬"
+    };
+
+    function updateUI() {
+      document.getElementById("coins").textContent = coins;
+      for (const type in inventory) {
+        const span = document.getElementById(type + "Count");
+        if (span) span.textContent = inventory[type];
+      }
+      renderInventory();
+      updatePlantInfoDisplay();
+    }
+
+    function toggleSeedMenu() {
+      const menu = document.getElementById("seedMenu");
+      menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+      renderSeedMenu();
+    }
+
+    function showNotEnoughMoneyMsg() {
+      const msg = document.getElementById('notEnoughMoneyMsg');
+      if (!msg) return;
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    }
+    function showNoFruitsMsg() {
+      const msg = document.getElementById('noFruitsMsg');
+      if (!msg) return;
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    }
+
+    function renderSeedMenu() {
+      const container = document.getElementById("seedMenu");
+      container.innerHTML = "<p><strong>Select a seed to buy:</strong></p>";
+      for (const type in inventory) {
+        const btn = document.createElement("button");
+        btn.textContent = `${type} (${prices[type]} shekels)`;
+        btn.onclick = () => {
+          if (coins >= prices[type]) {
+            coins -= prices[type];
+            inventory[type]++;
+            selectedSeed = type;
+            updateUI();
+          } else {
+            showNotEnoughMoneyMsg();
+          }
+        };
+        container.appendChild(btn);
+      }
+    }
+
+    function plant() {
+      // Use only selectedSeed (must be selected from inventory)
+      const type = selectedSeed;
+      if (!type) {
+        alert('Select a seed to plant!');
+        return;
+      }
+      if (inventory[type] <= 0) {
+        alert(`No ${type} seeds!`);
+        return;
+      }
+      inventory[type]--;
+      const container = document.createElement('div');
+      container.style.position = 'relative';
+
+      const plantDiv = document.createElement('div');
+      plantDiv.className = 'plant';
+      plantDiv.textContent = emojiMap[type] || "🌱";
+      container.appendChild(plantDiv);
+
+      const label = document.createElement('span');
+      label.style.position = 'absolute';
+      label.style.top = '105px';
+      label.style.fontSize = '12px';
+      label.style.width = '100%';
+      label.textContent = 'Growing... 0%';
+      container.appendChild(label);
+
+      document.getElementById('garden').appendChild(container);
+      plants.push({ element: container, type });
+
+      let percent = 0;
+      let step = prices[type] / 5 + 150;
+
+      const interval = setInterval(() => {
+        percent += 10;
+        label.textContent = `Growing... ${percent}%`;
+        if (percent >= 100) {
+          clearInterval(interval);
+          label.textContent = 'Ready!';
+        }
+      }, step);
+
+      plantIntervals.push(interval);
+      updateUI();
+    }
+
+    function harvest() {
+      let harvestedAny = false;
+      for (let i = 0; i < plants.length; i++) {
+        const label = plants[i].element.querySelector('span');
+        if (label.textContent === 'Ready!') {
+          plants[i].element.remove();
+          harvested.push(plants[i].type);
+          plants.splice(i, 1); // remove from array
+          harvestedAny = true;
+          break; // Only harvest one
+        }
+      }
+      if (!harvestedAny) {
+        showNoFruitsMsg();
+      }
+    }
+
+    function sell() {
+      harvested.forEach(type => {
+        coins += sellValues[type];
+      });
+      harvested = [];
+      updateUI();
+    }
+
+    function saveGame() {
+      let name = prompt('Enter a name for your save:');
+      if (!name) return;
+      const saveData = {
+        coins,
+        selectedSeed,
+        inventory,
+        harvested,
+        plants: plants.map(p => ({ type: p.type, percent: getPlantPercent(p.element) }))
+      };
+      localStorage.setItem('gardenSave_' + name, JSON.stringify(saveData));
+      alert('Game saved as "' + name + '"!');
+    }
+
+    function showLoadGameModal() {
+      const modal = document.getElementById('loadGameModal');
+      const saveList = document.getElementById('saveList');
+      saveList.innerHTML = '';
+      let found = false;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('gardenSave_')) {
+          found = true;
+          const saveName = key.replace('gardenSave_', '');
+          const btn = document.createElement('button');
+          btn.textContent = saveName;
+          btn.style.margin = '6px';
+          btn.onclick = function() { loadGameByName(saveName); closeLoadGameModal(); };
+          saveList.appendChild(btn);
+        }
+      }
+      if (!found) {
+        saveList.innerHTML = '<p>No saved games found.</p>';
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closeLoadGameModal() {
+      document.getElementById('loadGameModal').style.display = 'none';
+    }
+
+    function loadGameByName(name) {
+      const data = localStorage.getItem('gardenSave_' + name);
+      if (!data) {
+        alert('Save not found!');
+        return;
+      }
+      const saveData = JSON.parse(data);
+      coins = saveData.coins;
+      selectedSeed = saveData.selectedSeed;
+      Object.assign(inventory, saveData.inventory);
+      harvested = saveData.harvested || [];
+      document.getElementById('garden').innerHTML = '';
+      plants = [];
+      saveData.plants.forEach(p => {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        const plantDiv = document.createElement('div');
+        plantDiv.className = 'plant';
+        plantDiv.textContent = emojiMap[p.type] || "🌱";
+        container.appendChild(plantDiv);
+        const label = document.createElement('span');
+        label.style.position = 'absolute';
+        label.style.top = '105px';
+        label.style.fontSize = '12px';
+        label.style.width = '100%';
+        if (p.percent >= 100) {
+          label.textContent = 'Ready!';
+        } else {
+          label.textContent = `Growing... ${p.percent}%`;
+          growPlant(container, p.type, p.percent);
+        }
+        container.appendChild(label);
+        document.getElementById('garden').appendChild(container);
+        plants.push({ element: container, type: p.type });
+      });
+      updateUI();
+      const menu = document.getElementById('seedMenu');
+      if (menu.style.display === 'block') {
+        renderSeedMenu();
+      }
+      alert('Game loaded: ' + name);
+    }
+
+    function getPlantPercent(element) {
+      const label = element.querySelector('span');
+      if (!label) return 0;
+      if (label.textContent === 'Ready!') return 100;
+      const match = label.textContent.match(/(\d+)%/);
+      return match ? parseInt(match[1]) : 0;
+    }
+
+    function growPlant(container, type, startPercent) {
+      const label = container.querySelector('span');
+      let percent = startPercent;
+      let step = prices[type] / 5 + 150;
+      const interval = setInterval(() => {
+        percent += 10;
+        label.textContent = `Growing... ${percent}%`;
+        if (percent >= 100) {
+          clearInterval(interval);
+          label.textContent = 'Ready!';
+        }
+      }, step);
+      plantIntervals.push(interval);
+    }
+
+    function pauseGame() {
+      // Pause all plant growth intervals
+      plantIntervals.forEach(clearInterval);
+      plantIntervals = [];
+      document.getElementById('pauseModal').style.display = 'flex';
+    }
+
+    function resumeGame() {
+      // Resume all growing plants
+      plants.forEach(p => {
+        const label = p.element.querySelector('span');
+        if (label && label.textContent.startsWith('Growing')) {
+          const percent = getPlantPercent(p.element);
+          growPlant(p.element, p.type, percent);
+        }
+      });
+      document.getElementById('pauseModal').style.display = 'none';
+    }
+
+    function leaveGame() {
+      window.location.reload();
+    }
+
+    function quitGame() {
+      localStorage.removeItem('gardenSave');
+      // Hide all game UI and show a quit message
+      document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;"><div style="background:#fff;padding:40px 60px;border-radius:16px;box-shadow:0 2px 10px #0005;text-align:center;"><h1>Game Closed</h1><p>Thank you for playing!</p></div></div>';
+      setTimeout(() => {
+        document.body.innerHTML = '';
+      }, 3000);
+    }
+
+    function newGame() {
+      if (confirm('Are you sure you want to start a new game? All progress will be lost!')) {
+        localStorage.removeItem('gardenSave');
+        window.location.reload();
+      }
+    }
+
+    // Ensure inventory has all plants from the seed shop (prices)
+    for (const type in prices) {
+      if (!(type in inventory)) inventory[type] = 0;
+    }
+
+    function updatePlantInfoDisplay() {
+      const info = document.getElementById('plantInfoDisplay');
+      if (!info) return;
+      if (!selectedSeed) {
+        info.textContent = 'No seed selected';
+        return;
+      }
+      info.textContent = `${selectedSeed} (x${inventory[selectedSeed] ?? 0})`;
+    }
+
+    function renderInventory() {
+      const list = document.getElementById('inventoryList');
+      if (!list) return;
+      list.innerHTML = '';
+      // Only use types from prices (seed shop)
+      const allTypes = Object.keys(prices).sort((a, b) => prices[a] - prices[b]);
+      for (const type of allTypes) {
+        const emoji = emojiMap[type] || '';
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.gap = '6px';
+        item.style.background = (selectedSeed === type) ? '#ffe082' : '#f8f8f8';
+        item.style.borderRadius = '8px';
+        item.style.padding = '6px 12px';
+        item.style.boxShadow = '0 1px 3px #0001';
+        item.style.cursor = 'pointer';
+        item.onclick = function() {
+          selectedSeed = type;
+          renderInventory();
+          updatePlantInfoDisplay();
+        };
+        item.innerHTML = `<span style='font-size:1.5em;'>${emoji}</span> <span>${type}</span> <span style='font-weight:bold;'>x${inventory[type]}</span>`;
+        list.appendChild(item);
+      }
+    }
+
+    function toggleInventory() {
+      const inv = document.getElementById('inventoryDisplay');
+      if (inv.style.display === 'none' || inv.style.display === '') {
+        inv.style.display = 'block';
+      } else {
+        inv.style.display = 'none';
+      }
+    }
+
+    function plantFromInventory() {
+      plant();
+    }
+
+    // Hide inventory when clicking outside
+    window.addEventListener('mousedown', function(e) {
+      const inv = document.getElementById('inventoryDisplay');
+      const btn = document.getElementById('toggleInventoryBtn');
+      if (!inv || inv.style.display === 'none') return;
+      if (!inv.contains(e.target) && !btn.contains(e.target)) {
+        inv.style.display = 'none';
+      }
+    });
+
+    // On page load, select nothing by default
+    window.onload = function() {
+      // Ensure all seeds from the shop are in inventory
+      for (const type in prices) {
+        if (!(type in inventory)) inventory[type] = 0;
+      }
+      selectedSeed = null;
+      updateUI();
+      updatePlantInfoDisplay();
+      document.getElementById('inventoryDisplay').style.display = 'none';
+    };
+
+    // Random restock every 3 minutes
+    function restockRandomSeeds() {
+      // Pick 3 random types from prices
+      const allTypes = Object.keys(prices);
+      const restockCount = 3;
+      const chosen = [];
+      while (chosen.length < restockCount) {
+        const idx = Math.floor(Math.random() * allTypes.length);
+        const type = allTypes[idx];
+        if (!chosen.includes(type)) chosen.push(type);
+      }
+      // Add 1-3 seeds for each chosen type
+      chosen.forEach(type => {
+        const amount = Math.floor(Math.random() * 3) + 1;
+        inventory[type] += amount;
+      });
+      updateUI();
+      alert('Restock! You received more seeds for: ' + chosen.map(t => `${t} (x${inventory[t]})`).join(', '));
+    }
+    setInterval(restockRandomSeeds, 3 * 60 * 1000); // 3 minutes
+  </script>
+</body>
+</html>
